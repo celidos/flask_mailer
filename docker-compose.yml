@@ -1,0 +1,50 @@
+version: '3'
+
+
+services:
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    volumes:
+      - ./rabbitmq-dev.conf:/etc/rabbitmq/rabbitmq.conf
+    ports:
+      - 5672:5672
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "5672" ]
+      interval: 5s
+      timeout: 15s
+      retries: 1
+    environment:
+      # RABBITMQ_DEFAULT_VHOST: rabbit1
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=password rabbitmq
+      - FLASK_APP=app.py
+      
+  
+  mongo:
+    image: mongo:latest
+    ports:
+       - 27017:27017
+     #volumes:
+     #  - ./data/db:/data/db
+     #environment:
+     #   MONGO_INITDB_ROOT_USERNAME: candouser
+     #   MONGO_INITDB_ROOT_PASSWORD: beerrules
+
+      
+  flask_mailer:
+    build:
+      context: flask_mailer/
+    depends_on:
+      - rabbitmq
+      - mongo
+    environment:
+      - RabbitHost=rabbitmq
+      - RabbitPort=5672
+      - RabbitUser=guest
+      - RabbitPass=guest
+      #- node_name=DS_BEER_CANS
+      - topic=dglux-render
+    volumes:
+      - ./data/cans/:/data/cans/
+    ports:
+      - 5000:5000
