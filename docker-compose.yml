@@ -14,7 +14,6 @@ services:
       timeout: 15s
       retries: 1
     environment:
-      # RABBITMQ_DEFAULT_VHOST: rabbit1
       - RABBITMQ_DEFAULT_USER=user
       - RABBITMQ_DEFAULT_PASS=password rabbitmq
       - FLASK_APP=app.py
@@ -24,13 +23,7 @@ services:
     image: mongo:latest
     ports:
        - 27017:27017
-     #volumes:
-     #  - ./data/db:/data/db
-     #environment:
-     #   MONGO_INITDB_ROOT_USERNAME: candouser
-     #   MONGO_INITDB_ROOT_PASSWORD: beerrules
 
-      
   flask_mailer:
     build:
       context: flask_mailer/
@@ -38,13 +31,6 @@ services:
       - rabbitmq
       - mongo
     environment:
-      - RabbitHost=rabbitmq
-      - RabbitPort=5672
-      - RabbitUser=guest
-      - RabbitPass=guest
-      #- node_name=DS_BEER_CANS
-      - topic=dglux-render
-    volumes:
-      - ./data/cans/:/data/cans/
+      # ...
     ports:
       - 5000:5000
